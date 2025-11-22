@@ -9,6 +9,7 @@
 # =============================================================================
 import numpy as np
 import scipy as sp
+from scipy import sparse 
 
 
 def is_diagonally_dominant(A: np.ndarray | sp.sparse.csc_array) -> bool | None:
@@ -23,7 +24,17 @@ def is_diagonally_dominant(A: np.ndarray | sp.sparse.csc_array) -> bool | None:
             w przeciwnym wypadku `False`.
         Jeżeli dane wejściowe są niepoprawne funkcja zwraca `None`.
     """
-    pass
+    if not isinstance(A, np.ndarray | sp.sparse.csc_array) or A.ndim != 2 or A.shape[0] != A.shape[1]:
+        return None
+    
+    for i in range(A.shape[0]):
+        row_sum = 0
+        for j in range(A.shape[0]):
+            if j != i:
+                row_sum += abs(A[i][j])
+        if row_sum >= A[i][i]:
+            return False
+    return True
 
 
 def residual_norm(A: np.ndarray, x: np.ndarray, b: np.ndarray) -> float | None:
@@ -40,4 +51,13 @@ def residual_norm(A: np.ndarray, x: np.ndarray, b: np.ndarray) -> float | None:
         (float): Wartość normy residuum dla podanych parametrów.
         Jeżeli dane wejściowe są niepoprawne funkcja zwraca `None`.
     """
-    pass
+    if not isinstance(A, np.ndarray) or not isinstance(b, np.ndarray) or not isinstance(x, np.ndarray):
+        return None
+    if b.shape[0] != A.shape[0]:
+        return None
+   
+    r = b - A @ x
+
+    return np.linalg.norm(r)
+
+
